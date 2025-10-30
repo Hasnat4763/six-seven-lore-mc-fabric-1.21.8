@@ -1,0 +1,70 @@
+package net.hasnat4763.items;
+
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.hasnat4763.items.ScreenHandler.SixSevenStoryBookScreenHandler;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.MapIdComponent;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.FilledMapItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
+
+public class SixSevenStoryBook extends Item {
+    public SixSevenStoryBook(Settings settings) {
+        super(settings);
+    }
+    @Override
+    public ActionResult use(World world, PlayerEntity player, Hand finalHand) {
+        ItemStack stack = player.getStackInHand(finalHand);
+
+        if (!world.isClient && world instanceof ServerWorld serverWorld) {
+            NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
+            NbtCompound nbt = customData != null ? customData.copyNbt() : new NbtCompound();
+            if (!nbt.contains("six_seven_story_map")) {
+                ItemStack mapStack = FilledMapItem.createMap(serverWorld, player.getBlockX(), player.getBlockZ(),
+                        (byte) 2, true, true);
+
+                MapIdComponent mapIdComponent = mapStack.get(DataComponentTypes.MAP_ID);
+                if (mapIdComponent != null) {
+                    nbt.putInt("six_seven_story_map", mapIdComponent.id());
+                    stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+                    player.getInventory().insertStack(mapStack);
+                }
+            }
+
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+
+                serverPlayer.openHandledScreen(new ExtendedScreenHandlerFactory<Hand>() {
+                    @Override
+                    public Hand getScreenOpeningData(ServerPlayerEntity player) {
+                        return finalHand;
+                    }
+
+                    @Override
+                    public Text getDisplayName() {
+                        return Text.translatable("screen.sixseven.story_book");
+                    }
+
+                    @Override
+                    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+                        return new SixSevenStoryBookScreenHandler(syncId, playerInventory, finalHand);
+                    }
+                });
+            }
+
+            player.sendMessage(Text.literal("The pages whisper as you open them..."), false);
+        }
+
+        return ActionResult.SUCCESS;
+    }
+}
