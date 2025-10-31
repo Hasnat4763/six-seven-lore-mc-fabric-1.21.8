@@ -22,7 +22,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"six-seven" {
+		"six_seven" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

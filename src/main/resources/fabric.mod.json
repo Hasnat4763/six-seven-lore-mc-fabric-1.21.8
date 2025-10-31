@@ -1,18 +1,18 @@
 {
 	"schemaVersion": 1,
-	"id": "six-seven",
+	"id": "six_seven",
 	"version": "${version}",
 	"name": "six seven",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "The Ancient Tale of Six Seven",
 	"authors": [
-		"Me!"
+		"Hasnat4763!"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC0-1.0",
-	"icon": "assets/six-seven/icon.png",
+	"license": "MIT",
+	"icon": "assets/six_seven/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -23,9 +23,9 @@
 		]
 	},
 	"mixins": [
-		"six-seven.mixins.json",
+		"six_seven.mixins.json",
 		{
-			"config": "six-seven.client.mixins.json",
+			"config": "six_seven.client.mixins.json",
 			"environment": "client"
 		}
 	],

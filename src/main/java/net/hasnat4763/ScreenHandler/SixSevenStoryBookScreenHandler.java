@@ -1,4 +1,4 @@
-package net.hasnat4763.items.ScreenHandler;
+package net.hasnat4763.ScreenHandler;
 
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;

@@ -1,7 +1,7 @@
 package net.hasnat4763.items;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.hasnat4763.items.ScreenHandler.SixSevenStoryBookScreenHandler;
+import net.hasnat4763.ScreenHandler.SixSevenStoryBookScreenHandler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.component.type.NbtComponent;
@@ -52,7 +52,7 @@ public class SixSevenStoryBook extends Item {
 
                     @Override
                     public Text getDisplayName() {
-                        return Text.translatable("screen.sixseven.story_book");
+                        return Text.translatable("screen.six_seven.story_book");
                     }
 
                     @Override
@@ -62,7 +62,7 @@ public class SixSevenStoryBook extends Item {
                 });
             }
 
-            player.sendMessage(Text.literal("The pages whisper as you open them..."), false);
+            player.sendMessage(Text.literal("Those who nose.........."), false);
         }
 
         return ActionResult.SUCCESS;

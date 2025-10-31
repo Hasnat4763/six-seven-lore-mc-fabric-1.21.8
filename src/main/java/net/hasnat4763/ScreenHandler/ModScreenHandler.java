@@ -1,4 +1,4 @@
-package net.hasnat4763.items.ScreenHandler;
+package net.hasnat4763.ScreenHandler;
 
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
