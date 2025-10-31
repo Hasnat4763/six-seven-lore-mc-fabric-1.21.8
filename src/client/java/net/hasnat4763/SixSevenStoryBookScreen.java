@@ -1,7 +1,7 @@
 package net.hasnat4763;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.hasnat4763.ScreenHandler.SixSevenStoryBookScreenHandler;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -28,18 +28,6 @@ public class SixSevenStoryBookScreen extends HandledScreen<SixSevenStoryBookScre
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        int x = (this.width - this.backgroundWidth) / 2;
-        int y = (this.height - this.backgroundHeight) / 2;
-        context.drawGuiTexture(
-                TEXTURE,
-                x, y,
-                this.backgroundWidth,
-                this.backgroundHeight
-        );
-    }
-
-    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
@@ -53,5 +41,20 @@ public class SixSevenStoryBookScreen extends HandledScreen<SixSevenStoryBookScre
     @Override
     protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
         context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 0xFF000000, true);
+    }
+
+    @Override
+    protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY) {
+        int x = (this.width - this.backgroundWidth) / 2;
+        int y = (this.height - this.backgroundHeight) / 2;
+        context.drawTexture(
+                RenderPipelines.GUI_TEXTURED,
+                TEXTURE,
+                x, y,
+                0, 0,
+                this.backgroundWidth,
+                this.backgroundHeight,
+                512, 256
+        );
     }
 }
