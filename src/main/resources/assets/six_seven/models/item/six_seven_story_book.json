@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "six_seven:item/six_seven_story_book"
+  }
+}

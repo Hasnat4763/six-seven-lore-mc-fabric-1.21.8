@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import static net.hasnat4763.SixSeven.MOD_ID;
 
+
 public class SixSevenStoryBookScreen extends HandledScreen<SixSevenStoryBookScreenHandler> {
 
     private static final Identifier TEXTURE = Identifier.of(MOD_ID, "textures/gui/six_seven.png");
@@ -35,6 +36,9 @@ public class SixSevenStoryBookScreen extends HandledScreen<SixSevenStoryBookScre
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Next >"), button -> {
             if (handler.getCurrentPage() < 9) {
                 handler.nextPage();
+            } else if (handler.getCurrentPage() >= 9) {
+                handler.nextPage();
+                this.close();
             }
         }).dimensions(x + backgroundWidth - 60, y + backgroundHeight - 30, 50, 20). build());
 
@@ -81,4 +85,5 @@ public class SixSevenStoryBookScreen extends HandledScreen<SixSevenStoryBookScre
     protected void handledScreenTick() {
         super.handledScreenTick();
     }
+
 }
