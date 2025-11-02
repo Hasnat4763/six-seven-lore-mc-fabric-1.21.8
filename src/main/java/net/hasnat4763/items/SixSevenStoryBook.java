@@ -6,8 +6,6 @@ import net.hasnat4763.ScreenHandler.SixSevenStoryBookScreenHandler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FilledMapItem;
@@ -17,8 +15,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -29,14 +25,6 @@ public class SixSevenStoryBook extends Item {
         super(settings);
     }
 
-   //@Override
-    //public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-       // if (!entity.getWorld().isClient()) {
-          //  entity.playSound(SoundEvents.ENTITY_PILLAGER_AMBIENT, 2f, 0.7f);
-        //}
-        //return super.useOnEntity(stack, user, entity, hand);
-    //}
-
     @Override
     public ActionResult use(World world, PlayerEntity player, Hand finalHand) {
         ItemStack stack = player.getStackInHand(finalHand);
@@ -44,6 +32,7 @@ public class SixSevenStoryBook extends Item {
         if (!world.isClient && world instanceof ServerWorld serverWorld) {
             NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
             NbtCompound nbt = customData != null ? customData.copyNbt() : new NbtCompound();
+
             if (!nbt.contains("six_seven_story_map")) {
                 ItemStack mapStack = FilledMapItem.createMap(serverWorld, player.getBlockX(), player.getBlockZ(),
                         (byte) 2, true, true);
@@ -80,8 +69,6 @@ public class SixSevenStoryBook extends Item {
             }
 
             player.sendMessage(Text.literal("Those who nose.........."), false);
-
-
         }
 
         return ActionResult.SUCCESS;

@@ -63,4 +63,6 @@ public class SixSevenStoryBookScreenHandler extends ScreenHandler {
     public ItemStack quickMove(PlayerEntity player, int slotIndex) {
         return ItemStack.EMPTY;
     }
+
+
 }
