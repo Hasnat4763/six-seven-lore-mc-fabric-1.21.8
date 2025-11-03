@@ -1,7 +1,9 @@
 package net.hasnat4763;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.hasnat4763.SixSevenCurse.SixSevenCurseDataKeeper;
 import net.hasnat4763.items.ModItems;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTables;
@@ -41,6 +43,7 @@ public class SixSeven implements ModInitializer {
         });
     }
 
+
     @Override
     public void onInitialize() {
         LOGGER.info("SixSeven mod initializing!");
@@ -53,5 +56,10 @@ public class SixSeven implements ModInitializer {
         RegisterCurseEventHandlers();
         modifyLootTables();
         RegisterCursePlayerJoin();
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+            SixSevenCurseDataKeeper data = SixSevenCurseDataKeeper.get(server);
+            data.save(server);
+            SixSevenCurseDataKeeper.clearInstance(server);
+        });
     }
 }

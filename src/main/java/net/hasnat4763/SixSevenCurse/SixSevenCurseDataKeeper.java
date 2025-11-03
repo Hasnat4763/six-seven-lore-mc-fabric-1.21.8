@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class SixSevenCurseDataKeeper {
     private static final String DATA_NAME = "six_seven_curse";
-    private static SixSevenCurseDataKeeper instance;
+    private static final Map<MinecraftServer, SixSevenCurseDataKeeper> instances = new HashMap<>();
 
     private final Map<UUID, PlayerCurseInfo> cursedPlayers = new HashMap<>();
     private boolean isDirty = false;
@@ -72,11 +72,15 @@ public class SixSevenCurseDataKeeper {
     private SixSevenCurseDataKeeper() {}
 
     public static SixSevenCurseDataKeeper get(MinecraftServer server) {
-        if (instance == null) {
-            instance = new SixSevenCurseDataKeeper();
-            instance.load(server);
-        }
-        return instance;
+        return instances.computeIfAbsent(server, s -> {
+            SixSevenCurseDataKeeper keeper = new SixSevenCurseDataKeeper();
+            keeper.load(s);
+            return keeper;
+        });
+    }
+
+    public static void clearInstance(MinecraftServer server) {
+        instances.remove(server);
     }
 
     private void load(MinecraftServer server) {
@@ -118,7 +122,6 @@ public class SixSevenCurseDataKeeper {
     private void readFromNbt(NbtCompound nbt) {
         cursedPlayers.clear();
 
-        // New format: has "cursedPlayers" compound
         if (nbt.contains("cursedPlayers")) {
             for (String uuidString : nbt.getKeys()) {
                 try {

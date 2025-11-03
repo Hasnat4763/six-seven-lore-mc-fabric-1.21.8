@@ -27,9 +27,8 @@ public class SixSevenClient implements ClientModInitializer {
     }
     private static SoundEvent getMusicForCurseLevel(int level) {
         return switch (level) {
-            case 0, 1 -> ModSounds.RICKROLL;           // Early curse levels
-            case 2, 3, 4, 5 -> ModSounds.THICK_OF_IT;  // Higher curse levels
-            default -> ModSounds.RICKROLL;              // Fallback
+            case 0, 1 -> ModSounds.THICK_OF_IT;
+            default -> ModSounds.RICKROLL;
         };
     }
 }

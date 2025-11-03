@@ -9,22 +9,17 @@ import net.minecraft.sound.SoundEvent;
 @Environment(EnvType.CLIENT)
 public class SixSevenCurseMusicHandler {
     public static void playCustomMusic(SoundEvent music) {
-    MinecraftClient client = MinecraftClient.getInstance();
-
-    if (client == null || client.world == null) {
-        return;
-    }
-    client.getMusicTracker().stop();
-    client.getSoundManager().play(PositionedSoundInstance.music(music, 2.0f));
-    SixSeven.LOGGER.info("Playing custom music");
-}
-
-
-    public static void stopCustomMusic() {
         MinecraftClient client = MinecraftClient.getInstance();
+
         if (client == null || client.world == null) {
             return;
         }
+
+        client.getMusicTracker().stop();
+
         client.getSoundManager().stopAll();
+
+        client.getSoundManager().play(PositionedSoundInstance.music(music, 1.0F));
+        SixSeven.LOGGER.info("Playing custom music");
     }
 }
