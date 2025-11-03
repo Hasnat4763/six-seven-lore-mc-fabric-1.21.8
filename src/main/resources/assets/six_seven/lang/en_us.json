@@ -1,5 +1,7 @@
 {
   "screen.six_seven.story_book": "Ancient Tale of Six Seven",
   "item.six_seven.six_seven_story_book" : "Ancient Tale of Six Seven",
-  "effect.six_seven.six_seven_curse_effect": "Six Seven Curse"
+  "effect.six_seven.six_seven_curse_effect": "Six Seven Curse",
+  "sound.six_seven.six_seven_story_book_open": "Story Book Opening",
+    "sound.six_seven.rickroll": "Never Gonna Give You Up!"
 }

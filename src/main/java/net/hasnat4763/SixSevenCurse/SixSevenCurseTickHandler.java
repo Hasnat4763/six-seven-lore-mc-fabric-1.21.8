@@ -28,17 +28,11 @@ public class SixSevenCurseTickHandler {
                 saveCounter = 0;
             }
 
-            // Beat log once per second so we know this runs
-            if (server.getTicks() % 20 == 0) {
-                SixSeven.LOGGER.info("[SixSevenCurse] Tick beat (players={} ticks={})",
-                        server.getPlayerManager().getPlayerList().size(), server.getTicks());
-            }
 
-            // Check cooldowns every 20 ticks (~1s)
             if (tickCounter % 20 != 0) return;
 
             SixSevenCurseDataKeeper curseData = SixSevenCurseDataKeeper.get(server);
-            long now = server.getOverworld().getTime(); // or server.getTicks() if your keeper uses server ticks
+            long now = server.getOverworld().getTime();
 
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 var info = curseData.getCurseInfo(player.getUuid());
@@ -47,17 +41,16 @@ public class SixSevenCurseTickHandler {
                     continue;
                 }
 
-                // Keep level up-to-date
                 curseData.updateCurseLevel(player.getUuid(), now);
 
                 int cooldown = switch (info.curseLevel) {
-                    case 0 -> 1200; // 1 min
-                    case 1 -> 900;  // 45s
-                    case 2 -> 600;  // 30s
-                    case 3 -> 400;  // 20s
-                    case 4 -> 300;  // 15s
-                    case 5 -> 200;  // 10s
-                    default -> 1200;
+                    case 0 -> 120;
+                    case 1 -> 90;
+                    case 2 -> 60;
+                    case 3 -> 40;
+                    case 4 -> 30;
+                    case 5 -> 20;
+                    default -> 120;
                 };
 
                 boolean should = curseData.shouldTriggerEffect(player.getUuid(), now, cooldown);

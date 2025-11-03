@@ -3,15 +3,9 @@ package net.hasnat4763.items;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.hasnat4763.ModSounds;
 import net.hasnat4763.ScreenHandler.SixSevenStoryBookScreenHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -27,23 +21,8 @@ public class SixSevenStoryBook extends Item {
 
     @Override
     public ActionResult use(World world, PlayerEntity player, Hand finalHand) {
-        ItemStack stack = player.getStackInHand(finalHand);
 
         if (!world.isClient && world instanceof ServerWorld serverWorld) {
-            NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
-            NbtCompound nbt = customData != null ? customData.copyNbt() : new NbtCompound();
-
-            if (!nbt.contains("six_seven_story_map")) {
-                ItemStack mapStack = FilledMapItem.createMap(serverWorld, player.getBlockX(), player.getBlockZ(),
-                        (byte) 2, true, true);
-
-                MapIdComponent mapIdComponent = mapStack.get(DataComponentTypes.MAP_ID);
-                if (mapIdComponent != null) {
-                    nbt.putInt("six_seven_story_map", mapIdComponent.id());
-                    stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-                    player.getInventory().insertStack(mapStack);
-                }
-            }
 
             if (player instanceof ServerPlayerEntity serverPlayer) {
                 serverWorld.playSound(null, player.getBlockPos(), ModSounds.SIX_SEVEN_BOOK_OPEN,
@@ -68,7 +47,8 @@ public class SixSevenStoryBook extends Item {
                 });
             }
 
-            player.sendMessage(Text.literal("Those who nose.........."), false);
+            player.sendMessage(Text.literal("§8Those who nose..."), false);
+            player.sendMessage(Text.literal("§8...will soon find out."), false);
         }
 
         return ActionResult.SUCCESS;

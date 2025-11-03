@@ -4,5 +4,17 @@
     "sounds": [
       "six_seven:six_seven_book_open"
     ]
+  },
+  "rickroll": {
+    "subtitle": "sound.six_seven.rickroll",
+    "sounds": [
+      "six_seven:rickroll"
+    ]
+  },
+  "thick_of_it": {
+    "subtitle": "sound.six_seven.thick_of_it",
+    "sounds": [
+      "six_seven:thick_of_it"
+    ]
   }
 }

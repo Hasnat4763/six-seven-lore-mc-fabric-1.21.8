@@ -2,7 +2,9 @@ package net.hasnat4763.ScreenHandler;
 
 import net.hasnat4763.ModSounds;
 import net.hasnat4763.ModStatusEffect.ModEffects;
+import net.hasnat4763.SixSeven;
 import net.hasnat4763.SixSevenCurse.SixSevenCurseDataKeeper;
+import net.hasnat4763.networking.SixSevenNetworking;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -29,25 +31,27 @@ public class SixSevenStoryBookScreenHandler extends ScreenHandler {
     public SixSevenStoryBookScreenHandler(int syncId, PlayerInventory playerInventory, Hand hand) {
         super(ModScreenHandler.SIX_SEVEN_STORY_BOOK_HANDLER, syncId);
         this.bookStack = playerInventory.player.getStackInHand(hand);
-        this.propertyDelegate = new ArrayPropertyDelegate(1); // index 0 holds current page
+        this.propertyDelegate = new ArrayPropertyDelegate(1);
         this.addProperties(propertyDelegate);
     }
 
     private void nextPageServer() {
         int current = propertyDelegate.get(0);
-        if (current < TOTAL_PAGES) {
+        int lastPageIndex = TOTAL_PAGES - 1;
+        if (current < lastPageIndex) {
             int newPage = current + 1;
             propertyDelegate.set(0, newPage);
 
-            if (newPage >= TOTAL_PAGES) {
+            if (newPage == lastPageIndex) {
                 NbtComponent customData = bookStack.get(DataComponentTypes.CUSTOM_DATA);
                 NbtCompound nbt = customData != null ? customData.copyNbt() : new NbtCompound();
                 if (!nbt.contains("six_seven_read_complete")) {
                     nbt.putBoolean("six_seven_read_complete", true);
                     bookStack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+                    SixSeven.LOGGER.info("[Book] Marked book as read complete");
+                    sendContentUpdates();
                 }
             }
-            sendContentUpdates();
         }
     }
 
@@ -58,7 +62,6 @@ public class SixSevenStoryBookScreenHandler extends ScreenHandler {
             sendContentUpdates();
         }
     }
-
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
         if (player.getWorld().isClient) return false;
@@ -97,33 +100,38 @@ public class SixSevenStoryBookScreenHandler extends ScreenHandler {
         int currentPage = propertyDelegate.get(0);
         super.onClosed(player);
 
+        SixSeven.LOGGER.info("[Book] onClosed - player: {}, currentPage: {}, isClient: {}",
+                player.getName().getString(), currentPage, player.getWorld().isClient);
+
         if (!player.getWorld().isClient && player instanceof ServerPlayerEntity sp) {
-            // If finished reading, apply curse once
-            if (currentPage >= TOTAL_PAGES) {
+            if (currentPage >= TOTAL_PAGES - 1) {
                 SixSevenCurseDataKeeper data = SixSevenCurseDataKeeper.get(sp.getServer());
                 SixSevenCurseDataKeeper.PlayerCurseInfo info = data.getCurseInfo(sp.getUuid());
-
                 if (info == null || !info.isCursed) {
+                    SixSeven.LOGGER.info("[Book] Applying curse to player {}", sp.getName().getString());
+
                     data.cursePlayer(sp.getUuid(), sp.getWorld().getTime());
 
-                    // Add HUD icon (no particles), long duration
                     sp.addStatusEffect(new StatusEffectInstance(
                             ModEffects.SIX_SEVEN_CURSE_EFFECT,
-                            20 * 60 * 60 * 24, // 24 hours
+                            20 * 60 * 60 * 24,
                             0,
-                            false, // ambient
-                            false, // showParticles
-                            true   // showIcon
+                            true,
+                            true,
+                            true
                     ));
 
-                    sp.sendMessage(Text.literal("§4§oYou feel a dark presence settling within you..."), true);
+                    sp.sendMessage(Text.literal("§4§oYou feel a dark presence settling within you..."), false);
+                    SixSeven.LOGGER.info("[Book] Sent curse message to player");
+                    SixSevenNetworking.SendCurseMusicPacket(sp);
+
                     sp.getWorld().playSound(
                             null,
                             sp.getBlockPos(),
                             ModSounds.SIX_SEVEN_BOOK_OPEN,
                             SoundCategory.AMBIENT,
-                            1f,
-                            1f
+                            1.0f,
+                            1.0f
                     );
                 }
             }

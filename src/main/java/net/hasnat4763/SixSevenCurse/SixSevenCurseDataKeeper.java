@@ -88,9 +88,12 @@ public class SixSevenCurseDataKeeper {
             if (dataFile.exists()) {
                 NbtCompound nbt = NbtIo.readCompressed(dataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
                 readFromNbt(nbt);
+                SixSeven.LOGGER.info("[SixSevenCurse] Loaded curse data for {} players", cursedPlayers.size());
+            } else {
+                SixSeven.LOGGER.info("[SixSevenCurse] No existing curse data found, starting fresh");
             }
         } catch (IOException e) {
-            SixSeven.LOGGER.error(String.valueOf(e));
+            SixSeven.LOGGER.error("[SixSevenCurse] Failed to load curse data", e);
         }
     }
 
@@ -108,20 +111,24 @@ public class SixSevenCurseDataKeeper {
             NbtIo.writeCompressed(nbt, dataFile.toPath());
             isDirty = false;
         } catch (IOException e) {
-            SixSeven.LOGGER.error(String.valueOf(e));
+            SixSeven.LOGGER.error("[SixSevenCurse] Failed to save curse data", e);
         }
     }
 
     private void readFromNbt(NbtCompound nbt) {
         cursedPlayers.clear();
+
+        // New format: has "cursedPlayers" compound
         if (nbt.contains("cursedPlayers")) {
             for (String uuidString : nbt.getKeys()) {
                 try {
                     UUID uuid = UUID.fromString(uuidString);
                     PlayerCurseInfo info = PlayerCurseInfo.fromNbt(nbt);
                     cursedPlayers.put(uuid, info);
+                    SixSeven.LOGGER.debug("[SixSevenCurse] Loaded curse data for player {}: cursed={}, level={}",
+                            uuidString, info.isCursed, info.curseLevel);
                 } catch (IllegalArgumentException e) {
-                    SixSeven.LOGGER.warn("Skipping invalid UUID in curse data entry: {}", uuidString);
+                    SixSeven.LOGGER.warn("[SixSevenCurse] Skipping invalid UUID in curse data: {}", uuidString);
                 }
             }
             return;
@@ -132,7 +139,8 @@ public class SixSevenCurseDataKeeper {
                 UUID uuid = UUID.fromString(key);
                 PlayerCurseInfo info = PlayerCurseInfo.fromNbt(nbt);
                 cursedPlayers.put(uuid, info);
-            } catch (IllegalArgumentException ignore) {
+            } catch (IllegalArgumentException e) {
+                SixSeven.LOGGER.debug("[SixSevenCurse] Skipping non-UUID key: {}", key);
             }
         }
     }
@@ -160,6 +168,7 @@ public class SixSevenCurseDataKeeper {
             info.curseStartTime = currentTime;
             info.curseLevel = 0;
             markDirty();
+            SixSeven.LOGGER.info("[SixSevenCurse] Cursed player {} at time {}", playerUuid, currentTime);
         }
     }
 
@@ -172,18 +181,22 @@ public class SixSevenCurseDataKeeper {
         if (info == null || !info.isCursed) return;
 
         long ticksSinceCurse = currentTime - info.curseStartTime;
-        long minutesSinceCurse = ticksSinceCurse / 1200;
+        long secondsSinceCurse = ticksSinceCurse / 60;
 
-        if (minutesSinceCurse >= 120) info.curseLevel = 5;
-        else if (minutesSinceCurse >= 60) info.curseLevel = 4;
-        else if (minutesSinceCurse >= 30) info.curseLevel = 3;
-        else if (minutesSinceCurse >= 15) info.curseLevel = 2;
-        else if (minutesSinceCurse >= 5) info.curseLevel = 1;
+        int oldLevel = info.curseLevel;
+        if (secondsSinceCurse >= 200) info.curseLevel = 5;
+        else if (secondsSinceCurse >= 160) info.curseLevel = 4;
+        else if (secondsSinceCurse >= 120) info.curseLevel = 3;
+        else if (secondsSinceCurse >= 80) info.curseLevel = 2;
+        else if (secondsSinceCurse >= 40) info.curseLevel = 1;
         else info.curseLevel = 0;
 
-        markDirty();
+        if (oldLevel != info.curseLevel) {
+            SixSeven.LOGGER.info("[SixSevenCurse] Player {} curse level changed: {} -> {}",
+                    playerUuid, oldLevel, info.curseLevel);
+            markDirty();
+        }
     }
-
 
     public boolean shouldTriggerEffect(UUID playerUuid, long currentTime, int cooldownTicks) {
         PlayerCurseInfo info = cursedPlayers.get(playerUuid);
@@ -206,6 +219,7 @@ public class SixSevenCurseDataKeeper {
         if (info != null) {
             info.isCursed = false;
             markDirty();
+            SixSeven.LOGGER.info("[SixSevenCurse] Removed curse from player {}", playerUuid);
         }
     }
 }
